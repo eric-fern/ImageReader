@@ -9,6 +9,7 @@ Present user with an image upload button.
 User uploads image of ingredients label
 Azure AI form recognizer provides an analysis about what you're eating and how healthy it is.
 This is the backend which hits an API with your image and gets the analysis back to send to the front end
+The front end sends their uploaded image via HTTP POST request to this image service right here.
 */
 
 class Program

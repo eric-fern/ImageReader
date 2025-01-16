@@ -1,0 +1,43 @@
+@page "/upload"
+@inject HttpClient Http
+
+<h3>Upload Image</h3>
+
+<input type="file" @onchange="HandleFileSelected" />
+<button @onclick="UploadImage">Upload</button>
+
+@if (!string.IsNullOrEmpty(ExtractedText))
+{
+    <h4>Extracted Text</h4>
+    <pre>@ExtractedText</pre>
+}
+
+@code {
+    private IBrowserFile selectedFile;
+    private string ExtractedText;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task UploadImage()
+    {
+        if (selectedFile != null)
+        {
+            using var content = new MultipartFormDataContent();
+            using var stream = selectedFile.OpenReadStream();
+            content.Add(new StreamContent(stream), "imageFile", selectedFile.Name);
+
+            var response = await Http.PostAsync("http://localhost:5000/api/upload", content);
+            if (response.IsSuccessStatusCode)
+            {
+                ExtractedText = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                ExtractedText = "Error uploading image.";
+            }
+        }
+    }
+}
