@@ -4,6 +4,7 @@ using Azure.AI.FormRecognizer.DocumentAnalysis; //Azure AI imports
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Net.Http;
 /*
 Present user with an image upload button.
 User uploads image of ingredients label

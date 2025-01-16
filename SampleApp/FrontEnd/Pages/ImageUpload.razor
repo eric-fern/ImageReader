@@ -1,8 +1,11 @@
+
+@* designate url, inject our http client singleton (Instance?) into our component, need to use forms name space *@
 @page "/upload"
 @inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Forms
 
 <h3>Upload Image</h3>
-
+@*simple input element for selecting our image, WHEN IMAGE SELECTED, RUN HandleFileSelected() *@
 <input type="file" @onchange="HandleFileSelected" />
 <button @onclick="UploadImage">Upload</button>
 
@@ -15,12 +18,24 @@
 @code {
     private IBrowserFile selectedFile;
     private string ExtractedText;
-
-    private void HandleFileSelected(InputFileChangeEventArgs e)
+    private string ErrorMessage?;
+@*We only accept image files*@
+private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        selectedFile = e.File;
-    }
+        var file = e.File;
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
 
+        if (allowedExtensions.Contains(Path.GetExtension(file.Name).ToLower()))
+        {
+            selectedFile = file;
+            ErrorMessage = null;
+        }
+        else
+        {
+            selectedFile = null;
+            ErrorMessage = "Please select a valid image file.";
+        }
+    }
     private async Task UploadImage()
     {
         if (selectedFile != null)
