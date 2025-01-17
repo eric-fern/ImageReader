@@ -1,12 +1,11 @@
-
-@* designate url, inject our http client singleton (Instance?) into our component, need to use forms name space *@
 @page "/upload"
 @inject HttpClient Http
+
 @using Microsoft.AspNetCore.Components.Forms
 
 <h3>Upload Image</h3>
-@*simple input element for selecting our image, WHEN IMAGE SELECTED, RUN HandleFileSelected() *@
-<input type="file" @onchange="HandleFileSelected" />
+
+<InputFile OnChange="HandleFileSelected" />
 <button @onclick="UploadImage">Upload</button>
 
 @if (!string.IsNullOrEmpty(ExtractedText))
@@ -15,12 +14,17 @@
     <pre>@ExtractedText</pre>
 }
 
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
 @code {
     private IBrowserFile? selectedFile;
     private string? ExtractedText;
-    private string ErrorMessage?;
-@*We only accept image files*@
-private void HandleFileSelected(InputFileChangeEventArgs e)
+    private string? ErrorMessage;
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
@@ -33,9 +37,10 @@ private void HandleFileSelected(InputFileChangeEventArgs e)
         else
         {
             selectedFile = null;
-            ErrorMessage = "Please select a valid image file.";
+            ErrorMessage = "Invalid file type. Please select an image file.";
         }
     }
+
     private async Task UploadImage()
     {
         if (selectedFile != null)
@@ -43,22 +48,21 @@ private void HandleFileSelected(InputFileChangeEventArgs e)
             using var content = new MultipartFormDataContent();
             using var stream = selectedFile.OpenReadStream();
             content.Add(new StreamContent(stream), "imageFile", selectedFile.Name);
-            //stream the bytes from local machine to my server
-            //blob
-            //azure function file upload receive to blob
+
             var response = await Http.PostAsync("http://localhost:5000/api/upload", content);
             if (response.IsSuccessStatusCode)
             {
                 ExtractedText = await response.Content.ReadAsStringAsync();
+                ErrorMessage = null;
             }
             else
             {
-                ExtractedText = "Error uploading image.";
+                ErrorMessage = "Failed to upload image.";
             }
+        }
+        else
+        {
+            ErrorMessage = "No file selected.";
         }
     }
 }
-//HTTP POST request to a web API
-//need a way to know blob arrived
-//event grid pushes notif out
-//after azure function receives blob, create a message for the queue saying Image ready to process here is the URL
