@@ -43,7 +43,9 @@ private void HandleFileSelected(InputFileChangeEventArgs e)
             using var content = new MultipartFormDataContent();
             using var stream = selectedFile.OpenReadStream();
             content.Add(new StreamContent(stream), "imageFile", selectedFile.Name);
-
+            //stream the bytes from local machine to my server
+            //blob
+            //azure function file upload receive to blob
             var response = await Http.PostAsync("http://localhost:5000/api/upload", content);
             if (response.IsSuccessStatusCode)
             {
@@ -56,3 +58,7 @@ private void HandleFileSelected(InputFileChangeEventArgs e)
         }
     }
 }
+//HTTP POST request to a web API
+//need a way to know blob arrived
+//event grid pushes notif out
+//after azure function receives blob, create a message for the queue saying Image ready to process here is the URL
