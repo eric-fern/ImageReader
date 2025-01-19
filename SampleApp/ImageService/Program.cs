@@ -28,7 +28,7 @@ class Program
             // Build the configuration. Ends up creating an IConfigurationRoot object which is used to access our json stuff
             .Build();
 
-        // Retrieve the endpoint and API key from the configuration
+        // Retrieve the endpoint and API key from the appsettings.json =
         string endpoint = config["FormRecognizer:Endpoint"];
         string apiKey = config["FormRecognizer:ApiKey"];
         //string imagePath = "<path-to-your-image>";
