@@ -1,6 +1,3 @@
----
-title: Image Processing Flow
----
 sequenceDiagram
     participant User
     participant Frontend as Frontend (Blazor WASM)
