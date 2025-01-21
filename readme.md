@@ -5,7 +5,7 @@
 - User uploads image of ingredients label
 - Web client sends HTTP POST of the image to our console app (Wrapper for Azure AI Form Analyzer API)
 - Our Console App Wrapper passes the image to the Form service, makes sure we received only image data, hides our API key, and load limits our service. 
-- Images to be proceessed are stored in a queue. It will be a queue of URLs (URLs point to blob image storage on cloud).
+- Images to be proceessed are stored in a queue. It will be a queue of URLs (URLs point to Azure blob storage).
 
 ```mermaid
 sequenceDiagram
