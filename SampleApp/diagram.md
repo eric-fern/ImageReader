@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
 participant User
 participant Frontend as Frontend (Blazor WASM)
@@ -11,3 +12,5 @@ Backend->>Azure: Forward processed request
 Azure->>Backend: Return analysis results
 Backend->>Frontend: Return formatted results
 Frontend->>User: Display results
+
+```
