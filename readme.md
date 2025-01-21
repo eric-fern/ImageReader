@@ -17,9 +17,9 @@ participant Azure as Azure Form Recognizer
 User->>Frontend: Select image file
 Frontend->>Frontend: Process file in ImageUpload.razor
 Frontend->>Backend: Send image file wit http post request
-Backend->>>Backend:Put image in a queue (queue of URLs to be processed)
-Backend->>>Backend:Rate limit and only accept images to form analyzer
-Backend->>>Backend:Hide our API keys and increase security. Avoid Cross-Origin Resource sharing (CORS)
+Backend->>Backend:Put image in a queue (queue of URLs to be processed)
+Backend->>Backend:Rate limit and only accept images to form analyzer
+Backend->>Backend:Hide our API keys and increase security. Avoid Cross-Origin Resource sharing (CORS)
 Backend->>Azure: put the image in a queue to get analyzed, Rate-limit, only accept inmage, hide api keys.
 Azure->>Backend: Return analysis results
 Backend->>Frontend: Return formatted results
