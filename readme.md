@@ -16,8 +16,8 @@ participant Azure as Azure Form Recognizer
 
 User->>Frontend: Select image file
 Frontend->>Frontend: Process file in ImageUpload.razor
-Frontend->>Backend: Send image file
-Backend->>Azure: Forward processed request
+Frontend->>Backend: Send image file wit http post request
+Backend->>Azure: put the image in a queue to get analyzed, Rate-limit, only accept inmage, hide api keys.
 Azure->>Backend: Return analysis results
 Backend->>Frontend: Return formatted results
 Frontend->>User: Display results
