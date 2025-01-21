@@ -1,4 +1,4 @@
-##Azure AI form recognizer provides an analysis about what you're eating and how healthy it is.
+## Azure AI form recognizer provides an analysis about what you're eating and how healthy it is.
 
 
 - Present user with an image upload button.
