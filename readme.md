@@ -1,15 +1,8 @@
-sequenceDiagram
-    participant User
-    participant Frontend as Frontend (Blazor WASM)
-    participant Backend as Backend Service Wrapper
-    participant Azure as Azure Form Recognizer
+##Azure AI form recognizer provides an analysis about what you're eating and how healthy it is.
 
-    User->>Frontend: Select image file
-    Frontend->>Frontend: Process file in<br/>ImageUpload.razor
-    Frontend->>Backend: Send image file
-    Note over Backend: Handle authentication<br/>and request formatting
-    Backend->>Azure: Forward processed request
-    Azure->>Backend: Return analysis results
-    Note over Backend: Format response data
-    Backend->>Frontend: Return formatted results
-    Frontend->>User: Display results
+Present user with an image upload button.
+User uploads image of ingredients label
+Web client sends HTTP POST of the image to our console app (Wrapper for Azure AI Form Analyzer API)
+Our Console App Wrapper passes the image to the Form service, makes sure we received only image data, hides our API key, and load limits our service. 
+Images to be proceessed are stored in a queue. It will be a queue of URLs (URLs point to blob image storage on cloud).
+
