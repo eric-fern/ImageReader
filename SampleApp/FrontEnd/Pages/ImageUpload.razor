@@ -1,11 +1,22 @@
+@*this page can be reached at url/upload*@
 @page "/upload"
-@inject HttpClient Http
 
+@*dependency injection of our HttpClient and form stuff. This will
+-let us make HTTP requests to our API
+-use form methods and stuff
+*@
+
+@inject HttpClient Http
 @using Microsoft.AspNetCore.Components.Forms
 
 <h3>Upload Image</h3>
-
+@*
+InputFile component prompts user to pick image. Streams selected file.
+When the file changes, run the HandleFileSelected method.
+*@
 <InputFile OnChange="HandleFileSelected" />
+
+@*Once the button is clicked, run the UploadImage method*@
 <button @onclick="UploadImage">Upload</button>
 
 @if (!string.IsNullOrEmpty(ExtractedText))
@@ -20,14 +31,22 @@
 }
 
 @code {
+    @*IBrowserFile is an interface representing the file to upload selected by user
+      selectedFile represents user uploaded file*@
     private IBrowserFile? selectedFile;
+
     private string? ExtractedText;
+
     private string? ErrorMessage;
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
+        @*Selected file changes so raised event calling this method
+          check for .jpg and then set the new selected file as our IBrowserFile interface
+          e.File is our InputFileEventArgs - onfo was sent to this method when event raised 
+        *@
         var file = e.File;
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+        var allowedExtensions = new[] { ".jpg", ".jpeg" };
 
         if (allowedExtensions.Contains(Path.GetExtension(file.Name).ToLower()))
         {
@@ -37,7 +56,7 @@
         else
         {
             selectedFile = null;
-            ErrorMessage = "Invalid file type. Please select an image file.";
+            ErrorMessage = "Please upload a .jpg file";
         }
     }
 

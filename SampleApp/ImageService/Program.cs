@@ -1,24 +1,34 @@
 ﻿using Microsoft.Extensions.Configuration; //lets us load up api keys and settings from an appsettings.json
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+
+
 using Azure;
 using Azure.AI.FormRecognizer.DocumentAnalysis; //Azure AI imports
+using Azure.Storage.Queues;
+using Azure.Storage.Blobs;
+
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Net.Http;
+
 /*
-Present user with an image upload button.
-User uploads image of ingredients label
-Azure AI form recognizer provides an analysis (raw text then analyze in backend) about what you're eating and how healthy it is.
-This is the backend which hits an API with your image and gets the analysis back to send to the front end
 The front end sends their uploaded image via HTTP POST request to this image service right here.
+Configuration builder is for our json appsettings
+Host is for Configuring our services
+We need a service for handling blob storage, queue storage, form recognizerm, apicontroller.
+
+Changed csproj to Web project 
 */
+
 
 class Program
 {
     static async Task Main(string[] args)
     {
-        //go to our appsettings.json and assign apiKey and endpoint
-
+        //Create our appsettings.json
         // Create a ConfigurationBuilder instance
         var config = new ConfigurationBuilder()
             // Set the base path to the current directory
@@ -28,29 +38,49 @@ class Program
             // Build the configuration. Ends up creating an IConfigurationRoot object which is used to access our json stuff
             .Build();
 
-        // Retrieve the endpoint and API key from the appsettings.json =
-        string endpoint = config["FormRecognizer:Endpoint"];
-        string apiKey = config["FormRecognizer:ApiKey"];
-        //string imagePath = "<path-to-your-image>";
-
-        // Create the Azure credentials and client
-        var credential = new AzureKeyCredential(apiKey);
-        var client = new DocumentAnalysisClient(new Uri(endpoint), credential);
-        // Retrieve queue message 
-        //pull blob url
-        using var stream = new FileStream(imagePath, FileMode.Open);
-        //overload version lets me provide a URL instead of a 
-        var operation = await client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-read", stream);
-        var result = operation.Value;
-
-        foreach (var page in result.Pages)
-        {
-            foreach (var line in page.Lines)
+        // Create a HostBuilder instance
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices((context, services) =>
             {
-                Console.WriteLine(line.Content);
-            }
-        }
+                //pull all this stuff from our appsettings
+                //Retrieve configuration settings
+                //config[] pattern gives us access to our IConfigurationRoot object which lets us access our json stuff
+                string blobConnectionString = config["BlobStorage:ConnectionString"];
+                string queueConnectionString = config["QueueStorage:ConnectionString"];
+                string queueName = config["QueueStorage:QueueName"];
+                //our connection details to FormRecognizer
+                string endpoint = config["FormRecognizer:Endpoint"];
+                string apiKey = config["FormRecognizer:ApiKey"];
+
+                // Using our appsettings.json stuff that we pulled using conig[], we can set up our services (Singletons)
+                services.AddSingleton(new BlobServiceClient(blobConnectionString));
+                services.AddSingleton(new QueueClient(queueConnectionString, queueName));
+                services.AddSingleton(new DocumentAnalysisClient(new Uri(endpoint), new AzureKeyCredential(apiKey)));
+                //Add our API Controller
+                services.AddControllers();
+            })
+
+
+             .ConfigureWebHostDefaults(webBuilder =>
+             {
+                 webBuilder.Configure(app =>
+                 {
+                     app.UseRouting();
+
+                     app.UseEndpoints(endpoints =>
+                     {
+                         endpoints.MapControllers(); // Add this line
+                     });
+                 });
+             })
+
+            .Build();
+
+
+        // Run the host
+        await host.RunAsync();
     }
+
 }
 
 //CLAIM CHECK PATTERN (laundromat ticket)
