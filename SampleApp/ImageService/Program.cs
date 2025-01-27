@@ -19,6 +19,7 @@ The front end sends their uploaded image via HTTP POST request to this image ser
 Configuration builder is for our json appsettings
 Host is for Configuring our services
 We need a service for handling blob storage, queue storage, form recognizerm, apicontroller.
+WebHost lets us listen for HTTP requests
 
 Changed csproj to Web project 
 */
@@ -38,6 +39,24 @@ class Program
             // Build the configuration. Ends up creating an IConfigurationRoot object which is used to access our json stuff
             .Build();
 
+        string[] requiredSettings = new[]
+{
+            "BlobStorage:ConnectionString",
+            "QueueStorage:ConnectionString",
+            "QueueStorage:QueueName",
+            "FormRecognizer:Endpoint",
+            "FormRecognizer:ApiKey"
+        };
+
+        foreach (var setting in requiredSettings)
+        {
+            if (string.IsNullOrEmpty(config[setting]))
+            {
+                Console.WriteLine($"{setting} is required.");
+                return;
+            }
+        }
+
         // Create a HostBuilder instance
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
@@ -56,15 +75,16 @@ class Program
                 services.AddSingleton(new BlobServiceClient(blobConnectionString));
                 services.AddSingleton(new QueueClient(queueConnectionString, queueName));
                 services.AddSingleton(new DocumentAnalysisClient(new Uri(endpoint), new AzureKeyCredential(apiKey)));
-                //Add our API Controller
+                //Add our API Controllers
                 services.AddControllers();
             })
 
-
+            //we need to configure a webserver to listen for incoming HTTP requests
              .ConfigureWebHostDefaults(webBuilder =>
              {
                  webBuilder.Configure(app =>
                  {
+                     //using routing and endpoint mapping to route requests to the proper controller
                      app.UseRouting();
 
                      app.UseEndpoints(endpoints =>
