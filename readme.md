@@ -7,7 +7,11 @@
 - Our Console App Wrapper passes the image to the Form service, makes sure we received only image data, hides our API key, and load limits our service. 
 - Images to be proceessed are stored in a queue. It will be a queue of URLs (URLs point to Azure blob storage).
 
+
+- Can easily add a macros visual calculator similar to CalAI, the AI might also hold your macros in context for future ingredients labels you're scanning.
+- The reason is, you might have hit your target fat, sugar, carbs or protein intake for the day, and you want to notify the user and store the data.
 ```mermaid
+
 sequenceDiagram
 participant User
 participant Frontend as Frontend (Blazor WASM)
