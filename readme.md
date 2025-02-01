@@ -1,6 +1,6 @@
 ## Azure AI form recognizer provides an analysis about what you're eating and how healthy it is.
 
-
+##OLD
 - Present user with an image upload button.
 - User uploads image of ingredients label
 - Web client/ios/android sends HTTP POST of the image to our Web API App (Wrapper for Azure AI Form Analyzer API)
@@ -30,3 +30,7 @@ Azure->>Backend: Return analysis results
 Backend->>Frontend: Return formatted results
 Frontend->>User: Display results
 ```
+
+
+##NEW 
+-get rid of webassembly and use simple UI, connected to API Gateway with SignalR, and API gateway connected to blazor server, connected to serverless azure endpoints. 
